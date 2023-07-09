@@ -1,0 +1,32 @@
+import nltk
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize, sent_tokenize
+
+def parse_resume(resume_text):
+    # Tokenize the text into sentences
+    sentences = sent_tokenize(resume_text)
+    
+    # Filter out stop words
+    stop_words = set(stopwords.words('english'))
+    
+    # Initialize a list to store relevant information
+    relevant_info = []
+    
+    # Iterate over each sentence
+    for sentence in sentences:
+        # Tokenize the sentence into words
+        words = word_tokenize(sentence)
+        
+        # Remove stop words and convert to lowercase
+        words = [word.lower() for word in words if word.lower() not in stop_words]
+        
+        # Check for relevant keywords
+        keywords = ['experience', 'skills', 'education', 'projects']  # Customize these keywords as per your needs
+        
+        for keyword in keywords:
+            if keyword in words:
+                # Add the relevant sentence to the list
+                relevant_info.append(sentence)
+                break
+    
+    return relevant_info
