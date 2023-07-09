@@ -1,0 +1,56 @@
+import nltk
+from nltk.corpus import words
+
+# Download the words corpus
+nltk.download('words')
+
+# Create a set of valid words from the corpus
+word_set = set(words.words())
+
+def auto_correct(word):
+    if word in word_set:
+        return word
+    
+    # Calculate the minimum edit distance for suggestions
+    suggestions = []
+    
+    # Insertion function
+    def insert(word, c):
+        return [word[:i] + c + word[i:] for i in range(len(word) + 1)]
+    
+    # Deletion function
+    def delete(word):
+        return [word[:i] + word[i+1:] for i in range(len(word))]
+    
+    # Substitution function
+    def substitute(word, c):
+        return [word[:i] + c + word[i+1:] for i in range(len(word))]
+    
+    # Transposition function
+    def transpose(word):
+        return [word[:i] + word[i+1] + word[i] + word[i+2:] for i in range(len(word) - 1)]
+    
+    # Generate all possible suggestions
+    def edits(word):
+        suggestions = set()
+        for c in word:
+            suggestions.update(insert(word, c))
+            suggestions.update(delete(word))
+            suggestions.update(substitute(word, c))
+            suggestions.update(transpose(word))
+        return suggestions
+    
+    # Find the suggestions with minimum edit distance
+    suggestions = edits(word)
+    valid_suggestions = [suggestion for suggestion in suggestions if suggestion in word_set]
+    
+    if valid_suggestions:
+        return min(valid_suggestions, key=lambda suggestion: nltk.edit_distance(word, suggestion))
+    else:
+        return "No suggestions found"
+
+# Test the auto_correct function
+input_word = "speling"
+correction = auto_correct(input_word)
+print(f"Input: {input_word}")
+print(f"Correction: {correction}")
